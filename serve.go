@@ -25,6 +25,10 @@ func randSeq(n int) string {
 
 func write(writer http.ResponseWriter, request *http.Request) {
 	database, _ := sql.Open("sqlite3", "./database.sqlite")
+
+	database.Query("PRAGMA journal_mode=WAL")
+	database.SetMaxOpenConns(1)
+
     statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS pages (id INTEGER PRIMARY KEY, title TEXT)")
     statement.Exec()
 
@@ -36,6 +40,9 @@ func write(writer http.ResponseWriter, request *http.Request) {
 
 func read(writer http.ResponseWriter, request *http.Request) {
 	database, _ := sql.Open("sqlite3", "./database.sqlite")
+
+	database.Query("PRAGMA journal_mode=WAL")
+	database.SetMaxOpenConns(1)
 
 	rows, _ := database.Query("SELECT * FROM pages WHERE id >= (abs(random()) % (SELECT max(id) FROM pages)) LIMIT 1")
     
